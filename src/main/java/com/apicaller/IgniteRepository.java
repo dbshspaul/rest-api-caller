@@ -43,7 +43,7 @@ public class IgniteRepository {
     }
 
     public String getCacheDataByKey(String cacheName, String key) throws IOException {
-        HttpGet httpGet = new HttpGet("http://" + ip + ":8080/cache/"+key+"?cache=" + cacheName);
+        HttpGet httpGet = new HttpGet("http://" + ip + ":8080/cache/" + key + "?cache=" + cacheName);
 
         CredentialsProvider provider = new BasicCredentialsProvider();
         UsernamePasswordCredentials credentials
@@ -187,16 +187,26 @@ public class IgniteRepository {
     }
 
 
-
     private String getResponseAsString(HttpResponse response) throws IOException {
-        BufferedReader rd = new BufferedReader(
-                new InputStreamReader(response.getEntity().getContent()));
+        String resp = "";
+        StringBuffer result = null;
+        try {
+            if (response.getEntity()!=null) {
+                BufferedReader rd = new BufferedReader(
+                        new InputStreamReader(response.getEntity().getContent()));
 
-        StringBuffer result = new StringBuffer();
-        String line = "";
-        while ((line = rd.readLine()) != null) {
-            result.append(line);
+                result = new StringBuffer();
+                String line = "";
+                while ((line = rd.readLine()) != null) {
+                    result.append(line);
+                }
+                resp = result.toString();
+            } else {
+                resp = "No data available.";
+            }
+        } catch (Exception e) {
+            resp = e.getMessage();
         }
-        return result.toString();
+        return resp;
     }
 }
